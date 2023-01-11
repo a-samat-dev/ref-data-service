@@ -1,0 +1,31 @@
+server:
+  port: 8081
+  servlet:
+    context-path: /ref-data-service
+spring:
+  application:
+    name: ref-data-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ref_data_service
+    username: postgres
+    password: postgres
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  flyway:
+    url: jdbc:postgresql://localhost:5432/ref_data_service
+    schemas: public
+    user: postgres
+    password: postgres
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    instance-id: ${spring.application.name}:${random.value}
