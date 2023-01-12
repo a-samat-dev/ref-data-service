@@ -11,6 +11,12 @@ spring:
       platform: h2
       data-locations: classpath:data.sql
       schema-locations: classpath:schema.sql
+  cloud:
+    discovery:
+      enabled: false
+    config:
+      discovery:
+        enabled: false
   flyway:
     enabled: false
   redis:
