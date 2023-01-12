@@ -9,7 +9,17 @@ spring:
     url: ${RDS_URL}
     user: ${RDS_USERNAME}
     password: ${RDS_PASSWORD}
+  redis:
+    host: ${REDIS_HOST}
+    port: ${REDIS_PORT}
+    username: ${REDIS_USERNAME}
+    password: ${REDIS_PASSWORD}
 eureka:
   client:
     service-url:
       defaultZone: http://awseb-awseb-13vv4savxy5co-1660512157.eu-central-1.elb.amazonaws.com/eureka
+redis:
+  host: localhost
+  port: 6379
+  username:
+  password:

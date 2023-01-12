@@ -23,6 +23,11 @@ spring:
     schemas: public
     user: postgres
     password: postgres
+  redis:
+    host: localhost
+    port: 6379
+    username:
+    password:
 eureka:
   client:
     service-url:

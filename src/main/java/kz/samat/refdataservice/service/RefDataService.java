@@ -3,13 +3,16 @@ package kz.samat.refdataservice.service;
 import kz.samat.refdataservice.exception.CustomException;
 import kz.samat.refdataservice.model.RefDataEntity;
 import kz.samat.refdataservice.model.RefDataType;
+import kz.samat.refdataservice.model.redis.RefDataCache;
 import kz.samat.refdataservice.repository.RefDataRepository;
+import kz.samat.refdataservice.repository.redis.RefDataCacheRepository;
 import kz.samat.refdataservice.util.MessageSource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 
 /**
@@ -22,6 +25,7 @@ import java.util.List;
 public class RefDataService {
 
     private final RefDataRepository refDataRepository;
+    private final RefDataCacheRepository refDataCacheRepository;
 
     /**
      * Gets reference data by data type
@@ -31,7 +35,20 @@ public class RefDataService {
      */
     public List<RefDataEntity> getRefDataByDataType(RefDataType dataType) {
         if (dataType != null) {
-            return refDataRepository.findAllByDataType(dataType);
+            Optional<RefDataCache> optionalRefData = refDataCacheRepository.findById(dataType);
+
+            if (optionalRefData.isPresent()) {
+                return optionalRefData.get().getRefDataList();
+            }
+
+            List<RefDataEntity> refDataEntityList = refDataRepository.findAllByDataType(dataType);
+
+            refDataCacheRepository.save(RefDataCache.builder()
+                    .dataType(dataType)
+                    .refDataList(refDataEntityList)
+                    .build());
+
+            return refDataEntityList;
         }
 
         throw CustomException.builder()

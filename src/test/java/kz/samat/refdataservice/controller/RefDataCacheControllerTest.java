@@ -3,9 +3,13 @@ package kz.samat.refdataservice.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kz.samat.refdataservice.model.RefDataEntity;
 import kz.samat.refdataservice.model.RefDataType;
+import kz.samat.refdataservice.model.redis.RefDataCache;
 import kz.samat.refdataservice.repository.RefDataRepository;
+import kz.samat.refdataservice.repository.redis.RefDataCacheRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.data.redis.AutoConfigureDataRedis;
+import org.springframework.boot.test.autoconfigure.data.redis.DataRedisTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -28,14 +32,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
+@AutoConfigureDataRedis
 @ActiveProfiles("test")
 @TestPropertySource(locations = "classpath:application-test.yml")
-class RefDataControllerTest {
+class RefDataCacheControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
     @Autowired
     private RefDataRepository refDataRepository;
+
+    @Autowired
+    private RefDataCacheRepository refDataCacheRepository;
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -66,6 +75,37 @@ class RefDataControllerTest {
     }
 
     @Test
+    void getRefDataByDataType_returnsCities_fromCache() throws Exception {
+        // given
+        List<RefDataEntity> expectedRefData = refDataRepository.findAllByDataType(RefDataType.CITY);
+        refDataCacheRepository.save(RefDataCache.builder()
+                .dataType(RefDataType.CITY)
+                .refDataList(expectedRefData)
+                .build());
+        // when
+        MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.get(
+                        "/api/v1/ref-data/by-data-type?dataType=CITY"))
+                .andExpect(status().isOk())
+                .andReturn();
+        // then
+        List<RefDataEntity> actualRefData = List.of(objectMapper.readValue(
+                mvcResult.getResponse().getContentAsString(UTF_8), RefDataEntity[].class));
+
+        assertNotNull(actualRefData);
+        assertEquals(expectedRefData.size(), actualRefData.size());
+
+        for (int i = 0; i < expectedRefData.size(); i++) {
+            assertEquals(expectedRefData.get(i).getId(), actualRefData.get(i).getId());
+            assertEquals(expectedRefData.get(i).getNameKz(), actualRefData.get(i).getNameKz());
+            assertEquals(expectedRefData.get(i).getNameEn(), actualRefData.get(i).getNameEn());
+            assertEquals(expectedRefData.get(i).getNameRu(), actualRefData.get(i).getNameRu());
+            assertEquals(RefDataType.CITY, actualRefData.get(0).getDataType());
+        }
+
+        refDataCacheRepository.deleteAll();
+    }
+
+    @Test
     void getRefDataByDataType_returnsCities() throws Exception {
         // given
         List<RefDataEntity> expectedRefData = refDataRepository.findAllByDataType(RefDataType.CITY);
@@ -87,7 +127,8 @@ class RefDataControllerTest {
             assertEquals(expectedRefData.get(i).getNameEn(), actualRefData.get(i).getNameEn());
             assertEquals(expectedRefData.get(i).getNameRu(), actualRefData.get(i).getNameRu());
             assertEquals(RefDataType.CITY, actualRefData.get(0).getDataType());
-
         }
+
+        refDataCacheRepository.deleteAll();
     }
 }

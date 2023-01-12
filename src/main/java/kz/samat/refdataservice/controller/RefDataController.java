@@ -15,7 +15,7 @@ import static kz.samat.refdataservice.util.AppConstants.JSON_UTF_8;
 
 /**
  * API endpoints for working with reference data
- *
+ * <p>
  * Created by Samat Abibulla 2022-11-15
  */
 @RestController
