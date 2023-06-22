@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dev-ref-data-service-deployment
+  labels:
+    app: dev-ref-data-service-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dev-ref-data-service-deployment
+  template:
+    metadata:
+      labels:
+        app: dev-ref-data-service-deployment
+    spec:
+      containers:
+        - name: dev-ref-data-service-deployment
+          image: asamatdev/sh-ref-data-service:0
+          ports:
+            - containerPort: 8080
+          imagePullPolicy: Always
+          envFrom:
+            - secretRef:
+                name: dev-sh-secrets
+            - configMapRef:
+                name: dev-sh-config-maps
+          resources:
+            requests:
+              memory: 256Mi
+              cpu: 50m
+            limits:
+              memory: 512Mi
+              cpu: 100m
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dev-ref-data-service
+spec:
+  selector:
+    app: dev-ref-data-service-deployment
+  ports:
+    - port: 8080
+      targetPort: 8080
