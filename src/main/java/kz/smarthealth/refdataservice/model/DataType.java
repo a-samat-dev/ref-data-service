@@ -7,5 +7,5 @@ package kz.smarthealth.refdataservice.model;
  */
 public enum DataType {
 
-    CITY, DOCTOR_TYPE
+    CITY, DOCTOR_TYPE, FAMILY_CONNECTION
 }

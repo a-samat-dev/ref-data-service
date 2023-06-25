@@ -86,4 +86,25 @@ class RefDataControllerTest {
         assertNotNull(doctorTypes.get(0).getNameRu());
         assertNull(doctorTypes.get(0).getParentId());
     }
+
+    @Test
+    void getRefDataByRefDataType_returnsFamilyConnections() throws Exception {
+        // when
+        MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/ref-data/by-data-type?dataType=FAMILY_CONNECTION")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding("utf-8"))
+                .andExpect(status().isOk()).andReturn();
+        // then
+        List<AbstractEntity> familyConnections = objectMapper.readValue(mvcResult.getResponse().getContentAsString(),
+                new TypeReference<>() {
+                });
+
+        assertFalse(familyConnections.isEmpty());
+        assertEquals(2, familyConnections.size());
+        assertNotNull(familyConnections.get(0).getId());
+        assertNotNull(familyConnections.get(0).getNameKz());
+        assertNotNull(familyConnections.get(0).getNameEn());
+        assertNotNull(familyConnections.get(0).getNameRu());
+        assertNull(familyConnections.get(0).getParentId());
+    }
 }
