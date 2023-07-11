@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: dev-ref-data-service-deployment
-          image: asamatdev/sh-ref-data-service:0
+          image: asamatdev/sh-ref-data-service:1
           ports:
             - containerPort: 8080
           imagePullPolicy: Always

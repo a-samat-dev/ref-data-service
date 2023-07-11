@@ -13,7 +13,7 @@ create table if not exists doctor_types
     name_kz   varchar(155) not null,
     name_en   varchar(155) not null,
     name_ru   varchar(155) not null,
-    parent_id integer references cities (id)
+    parent_id integer references doctor_types (id)
 );
 
 insert into cities (id, name_kz, name_en, name_ru)
