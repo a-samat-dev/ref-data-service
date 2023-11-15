@@ -1,6 +1,6 @@
-FROM openjdk:17-jdk-slim
-WORKDIR /app
-ENV PORT 8080
+FROM eclipse-temurin:17
+RUN apt-get install curl
+VOLUME /tmp
 EXPOSE 8080
-COPY target/*.jar /app/app.jar
-ENTRYPOINT exec java -Xmx128m $JAVA_OPTS -jar app.jar
+ADD target/demo-aws.jar demo-aws.jar
+ENTRYPOINT ["java","-jar","/demo-aws.jar"]
